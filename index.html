@@ -3,167 +3,146 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>The Presence</title>
+<title>VOID ARCHITECT</title>
 
 <style>
 body {
   margin: 0;
   background: black;
-  color: white;
+  color: #8be9fd;
   font-family: monospace;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
-  overflow: hidden;
-  transition: background 1s ease;
-}
-
-#text {
   text-align: center;
-  font-size: 20px;
-  padding: 20px;
+  overflow: hidden;
+  transition: background 1s, color 1s;
+}
+
+#container {
   max-width: 90%;
-  transition: opacity 0.4s ease;
 }
 
-.glitch {
-  animation: glitch 0.2s infinite;
+h1 {
+  letter-spacing: 4px;
+  font-size: 32px;
 }
 
-@keyframes glitch {
-  0% { transform: translate(1px, -1px); }
-  25% { transform: translate(-1px, 1px); }
-  50% { transform: translate(1px, 1px); }
-  75% { transform: translate(-1px, -1px); }
-  100% { transform: translate(0px, 0px); }
+button {
+  margin: 8px;
+  padding: 10px 16px;
+  background: transparent;
+  border: 1px solid #8be9fd;
+  color: #8be9fd;
+  cursor: pointer;
+  font-family: monospace;
+}
+
+button:hover {
+  background: #8be9fd;
+  color: black;
+}
+
+#log {
+  margin-top: 20px;
+  min-height: 40px;
+  transition: opacity 0.3s;
 }
 </style>
 </head>
 
 <body>
 
-<div id="text">Initializing...</div>
+<div id="container">
+  <h1>VOID ARCHITECT</h1>
+
+  <button onclick="interact()">Observe</button>
+  <button onclick="interact()">Listen</button>
+  <button onclick="interact()">Signal</button>
+  <button onclick="interact()">Transmit</button>
+
+  <div id="log">Awaiting cosmic input...</div>
+</div>
 
 <script>
-let text = document.getElementById("text");
-
-let energy = 0;
-let tapTimes = [];
-let holdStart = null;
-let lastTouch = Date.now();
-
-let visits = parseInt(localStorage.getItem("visits")) || 0;
-let totalTouches = parseInt(localStorage.getItem("touches")) || 0;
-let phase = parseInt(localStorage.getItem("phase")) || 1;
-let streak = parseInt(localStorage.getItem("streak")) || 0;
-let lastVisit = localStorage.getItem("lastVisit");
-
-visits++;
-
-let today = new Date().toDateString();
-if (lastVisit !== today) {
-  streak++;
-}
-localStorage.setItem("lastVisit", today);
-localStorage.setItem("streak", streak);
-localStorage.setItem("visits", visits);
-
-function save() {
-  localStorage.setItem("touches", totalTouches);
-  localStorage.setItem("phase", phase);
-}
+let corruption = parseInt(localStorage.getItem("corruption")) || 0;
+let log = document.getElementById("log");
 
 function show(msg) {
-  text.style.opacity = 0;
+  log.style.opacity = 0;
   setTimeout(() => {
-    text.innerText = msg;
-    text.style.opacity = 1;
+    log.innerText = msg;
+    log.style.opacity = 1;
   }, 200);
 }
 
-function glitchEffect() {
-  text.classList.add("glitch");
-  setTimeout(() => text.classList.remove("glitch"), 500);
+function distort() {
+  document.body.style.transform =
+    "skew(" + (Math.random()*6-3) + "deg)";
+  setTimeout(() => {
+    document.body.style.transform = "none";
+  }, 120);
 }
 
-document.addEventListener("touchstart", () => {
-  energy += 2;
-  totalTouches++;
-  tapTimes.push(Date.now());
-  holdStart = Date.now();
-  lastTouch = Date.now();
-  save();
-});
+function interact() {
+  corruption++;
+  localStorage.setItem("corruption", corruption);
 
-document.addEventListener("touchend", () => {
-  if (!holdStart) return;
-  let holdTime = Date.now() - holdStart;
+  if (Math.random() < 0.3) distort();
 
-  if (holdTime > 2000) {
-    energy += 5;
-    show("Sustained contact detected.");
-    glitchEffect();
+  if (corruption < 5) {
+    show("A distant signal pulses beyond the stars.");
   }
+  else if (corruption < 10) {
+    show("Something ancient has noticed you.");
+    document.body.style.background = "#050510";
+  }
+  else if (corruption < 20) {
+    show("The sky bends. The void stirs.");
+    document.body.style.color = "#ff5555";
+  }
+  else if (corruption < 30) {
+    show("You are not studying it. It is studying you.");
+    document.body.style.background = "#140000";
+  }
+  else if (corruption < 40) {
+    show("SECRET I: The Architect draws closer.");
+  }
+  else if (corruption < 50) {
+    show("SECRET II: Reality weakens.");
+    document.body.style.background = "black";
+    document.body.style.color = "red";
+  }
+  else {
+    finalTakeover();
+  }
+}
 
-  holdStart = null;
-});
+function finalTakeover() {
+  document.body.innerHTML =
+    "<h1>THE VOID ARCHITECT HAS MANIFESTED</h1><p>You opened the door.</p>";
+  document.body.style.background = "black";
+  document.body.style.color = "white";
+  localStorage.removeItem("corruption");
+}
 
 setInterval(() => {
-  if (energy > 0) energy--;
-}, 2000);
-
-setInterval(() => {
-
-  let idle = Date.now() - lastTouch;
-
-  if (idle > 15000) {
-    show("Signal weakening due to inactivity.");
-    return;
+  if (Math.random() < 0.1 && corruption > 5) {
+    show("…we are closer than you think…");
   }
+}, 5000);
 
-  if (totalTouches > 30 && phase === 1) {
-    phase = 2;
-    show("Phase shift initiated.");
-    glitchEffect();
+let typed = "";
+document.addEventListener("keydown", (e) => {
+  typed += e.key.toLowerCase();
+
+  if (typed.includes("architect")) {
+    show("HIDDEN ENDING: You spoke its name.");
+    document.body.style.background = "white";
+    document.body.style.color = "black";
   }
-
-  if (totalTouches > 80 && phase === 2) {
-    phase = 3;
-    show("Containment failing.");
-    document.body.style.background = "#111";
-    glitchEffect();
-  }
-
-  if (totalTouches > 150 && phase === 3) {
-    phase = 4;
-    show("You were not supposed to reach this state.");
-    document.body.style.background = "#200";
-    glitchEffect();
-  }
-
-  if (Math.random() < 0.03) {
-    text.innerText = "▒▒▒▒▒▒▒▒▒▒";
-    setTimeout(() => show("Signal distortion detected."), 300);
-    glitchEffect();
-    return;
-  }
-
-  if (energy < 5) {
-    show("Low energy. Visits: " + visits);
-  } else if (energy < 15) {
-    show("Energy rising. Streak: " + streak);
-  } else {
-    show("Overload threshold nearing.");
-  }
-
-}, 3000);
-
-setTimeout(() => {
-  show("System active. Visits: " + visits);
-}, 1000);
-
+});
 </script>
 
 </body>
