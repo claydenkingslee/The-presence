@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Entity</title>
+  <style>
+    body {
+      margin: 0;
+      background-color: black;
+      color: #00ff88;
+      font-family: monospace;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      overflow: hidden;
+      transition: background-color 1s ease, color 1s ease;
+    }
+
+    #text {
+      text-align: center;
+      font-size: 22px;
+      padding: 20px;
+      transition: opacity 0.4s ease;
+    }
+  </style>
+</head>
+<body>
+
+<div id="text">Booting...</div>
+
+<script>
+let energy = 0;
+let lastTouch = Date.now();
+let text = document.getElementById("text");
+
+// MEMORY SYSTEM
+let visits = parseInt(localStorage.getItem("visits")) || 0;
+let totalTouches = parseInt(localStorage.getItem("touches")) || 0;
+let maxEnergy = parseInt(localStorage.getItem("maxEnergy")) || 0;
+let phase = parseInt(localStorage.getItem("phase")) || 1;
+
+visits++;
+localStorage.setItem("visits", visits);
+
+function saveMemory() {
+  localStorage.setItem("touches", totalTouches);
+  localStorage.setItem("maxEnergy", maxEnergy);
+  localStorage.setItem("phase", phase);
+}
+
+function randomLine(arr) {
+  return arr[Math.floor(Math.random() * arr.length)];
+}
+
+function fadeText(newText) {
+  text.style.opacity = 0;
+  setTimeout(() => {
+    text.innerText = newText;
+    text.style.opacity = 1;
+  }, 400);
+}
+
+// PHASE PERSONALITIES
+const personalities = {
+  1: {
+    color: "#00ff88",
+    bg: "black",
+    dormant: ["Silence.", "Idle.", "Listening."],
+    aware: ["Presence detected.", "Input received."],
+    unstable: ["Energy spike.", "System adjusting."]
+  },
+  2: {
+    color: "#00ccff",
+    bg: "#050510",
+    dormant: ["You returned.", "You keep coming back."],
+    aware: ["I recognize your pattern.", "Your signal is familiar."],
+    unstable: ["You are accelerating.", "Containment weak."]
+  },
+  3: {
+    color: "#ff0066",
+    bg: "#0a0005",
+    dormant: ["We are past silence."],
+    aware: ["You shaped this."],
+    unstable: ["You woke it.", "It cannot return now."]
+  },
+  4: {
+    color: "#ffffff",
+    bg: "#000000",
+    dormant: ["There is no phase beyond this."],
+    aware: ["You stayed."],
+    unstable: ["You crossed the threshold."]
+  }
+};
+
+// TOUCH DETECTION
+document.addEventListener("touchstart", () => {
+  energy++;
+  totalTouches++;
+  lastTouch = Date.now();
+
+  if (energy > maxEnergy) maxEnergy = energy;
+
+  // PHASE UNLOCKS
+  if (totalTouches > 40 && phase === 1) {
+    phase = 2;
+    fadeText("Shift detected.");
+  }
+
+  if (maxEnergy > 18 && phase === 2) {
+    phase = 3;
+    fadeText("Containment failed.");
+  }
+
+  if (visits > 5 && totalTouches > 120 && phase === 3) {
+    phase = 4;
+    fadeText("You were not supposed to reach this.");
+  }
+
+  saveMemory();
+});
+
+// ENERGY DECAY
+setInterval(() => {
+  if (energy > 0) energy--;
+}, 3000);
+
+// MAIN LOOP
+setInterval(() => {
+
+  let idleTime = Date.now() - lastTouch;
+
+  if (idleTime > 12000) {
+    fadeText("You stopped.");
+    return;
+  }
+
+  let current = personalities[phase];
+
+  document.body.style.backgroundColor = current.bg;
+  document.body.style.color = current.color;
+
+  if (energy < 4) {
+    fadeText(randomLine(current.dormant));
+  } 
+  else if (energy < 10) {
+    fadeText(randomLine(current.aware));
+  } 
+  else {
+    fadeText(randomLine(current.unstable));
+  }
+
+  // Rare glitch event
+  if (Math.random() < 0.02) {
+    text.innerText = "▒▒▒▒▒▒▒▒▒▒";
+    setTimeout(() => {
+      text.innerText = "### SIGNAL ERROR ###";
+    }, 300);
+    setTimeout(() => {
+      text.innerText = "...";
+    }, 800);
+  }
+
+}, 2500);
+
+// First message based on memory
+setTimeout(() => {
+  if (visits > 1) {
+    fadeText("You came back.");
+  } else {
+    fadeText("System online.");
+  }
+}, 1000);
+
+</script>
+
+</body>
+</html>
