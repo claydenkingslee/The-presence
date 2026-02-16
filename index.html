@@ -4,70 +4,101 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOID ARCHITECT</title>
-
 <style>
 body {
-  margin: 0;
-  background: black;
-  color: #8be9fd;
+  margin:0;
+  overflow:hidden;
+  background:black;
+  color:#8be9fd;
   font-family: monospace;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
-  text-align: center;
-  overflow: hidden;
+  text-align:center;
   transition: background 1s, color 1s;
 }
 
 #container {
-  max-width: 90%;
+  position:relative;
+  z-index:2;
+  max-width:90%;
+  margin:auto;
+  padding-top:50px;
 }
 
 h1 {
-  letter-spacing: 4px;
-  font-size: 32px;
+  font-size:32px;
+  letter-spacing:4px;
 }
 
 button {
-  margin: 8px;
-  padding: 10px 16px;
-  background: transparent;
-  border: 1px solid #8be9fd;
-  color: #8be9fd;
-  cursor: pointer;
-  font-family: monospace;
+  margin:8px;
+  padding:10px 16px;
+  background:transparent;
+  border:1px solid #8be9fd;
+  color:#8be9fd;
+  cursor:pointer;
+  font-family:monospace;
 }
 
 button:hover {
-  background: #8be9fd;
-  color: black;
+  background:#8be9fd;
+  color:black;
 }
 
 #log {
-  margin-top: 20px;
-  min-height: 40px;
+  margin-top:20px;
+  min-height:40px;
   transition: opacity 0.3s;
+}
+
+#background {
+  position:fixed;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  z-index:1;
+  pointer-events:none;
+}
+
+#architect {
+  position:fixed;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  width:50%;
+  opacity:0;
+  transition: opacity 2s ease, transform 2s ease;
+  z-index:1;
+  pointer-events:none;
 }
 </style>
 </head>
-
 <body>
+<canvas id="background"></canvas>
+
+<img id="architect" src="https://i.imgur.com/42ykbD0.png" alt="Void Architect">
 
 <div id="container">
-  <h1>VOID ARCHITECT</h1>
+<h1>VOID ARCHITECT</h1>
+<button onclick="interact()">Observe</button>
+<button onclick="interact()">Listen</button>
+<button onclick="interact()">Signal</button>
+<button onclick="interact()">Transmit</button>
 
-  <button onclick="interact()">Observe</button>
-  <button onclick="interact()">Listen</button>
-  <button onclick="interact()">Signal</button>
-  <button onclick="interact()">Transmit</button>
-
-  <div id="log">Awaiting cosmic input...</div>
+<div id="log">Awaiting cosmic input...</div>
 </div>
 
 <script>
+// Persistent state
 let corruption = parseInt(localStorage.getItem("corruption")) || 0;
 let log = document.getElementById("log");
+let architectImg = document.getElementById("architect");
+
+// Typing hidden ending
+let typed = "";
+
+function save() {
+  localStorage.setItem("corruption", corruption);
+}
 
 function show(msg) {
   log.style.opacity = 0;
@@ -77,73 +108,104 @@ function show(msg) {
   }, 200);
 }
 
+// Screen distort for horror effect
 function distort() {
-  document.body.style.transform =
-    "skew(" + (Math.random()*6-3) + "deg)";
-  setTimeout(() => {
-    document.body.style.transform = "none";
-  }, 120);
+  document.body.style.transform = "skew(" + (Math.random()*6-3) + "deg)";
+  setTimeout(()=>{document.body.style.transform="none"},120);
 }
 
-function interact() {
+// Background starfield
+const canvas = document.getElementById("background");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = [];
+for(let i=0;i<200;i++){
+  stars.push({
+    x:Math.random()*canvas.width,
+    y:Math.random()*canvas.height,
+    size:Math.random()*2,
+    speed:Math.random()*0.5 + 0.2
+  });
+}
+
+function animateStars(){
+  ctx.fillStyle="black";
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+  ctx.fillStyle="white";
+  stars.forEach(s=>{
+    ctx.fillRect(s.x,s.y,s.size,s.size);
+    s.y += s.speed;
+    if(s.y>canvas.height) s.y=0;
+  });
+  requestAnimationFrame(animateStars);
+}
+animateStars();
+
+// Interaction function
+function interact(){
   corruption++;
-  localStorage.setItem("corruption", corruption);
+  save();
 
-  if (Math.random() < 0.3) distort();
+  if(Math.random()<0.3) distort();
 
-  if (corruption < 5) {
-    show("A distant signal pulses beyond the stars.");
+  // Phase 1
+  if(corruption<5){
+    show("A faint signal pulses from beyond.");
+    architectImg.style.opacity=0.1;
   }
-  else if (corruption < 10) {
-    show("Something ancient has noticed you.");
-    document.body.style.background = "#050510";
+  // Phase 2
+  else if(corruption<15){
+    show("The presence grows stronger. You feel its gaze.");
+    architectImg.style.opacity=0.3;
+    architectImg.style.transform="translate(-50%,-50%) scale(1.1)";
+    document.body.style.background="#050510";
   }
-  else if (corruption < 20) {
-    show("The sky bends. The void stirs.");
-    document.body.style.color = "#ff5555";
+  // Phase 3
+  else if(corruption<30){
+    show("The Void Architect begins to materialize.");
+    architectImg.style.opacity=0.6;
+    architectImg.style.transform="translate(-50%,-50%) scale(1.3)";
+    document.body.style.color="#ff5555";
   }
-  else if (corruption < 30) {
-    show("You are not studying it. It is studying you.");
-    document.body.style.background = "#140000";
+  // Phase 4
+  else if(corruption<50){
+    show("It looms over you. Reality distorts.");
+    architectImg.style.opacity=0.9;
+    architectImg.style.transform="translate(-50%,-50%) scale(1.5)";
+    document.body.style.background="#140000";
   }
-  else if (corruption < 40) {
-    show("SECRET I: The Architect draws closer.");
-  }
-  else if (corruption < 50) {
-    show("SECRET II: Reality weakens.");
-    document.body.style.background = "black";
-    document.body.style.color = "red";
-  }
-  else {
+  // Final Takeover
+  else{
     finalTakeover();
   }
 }
 
-function finalTakeover() {
-  document.body.innerHTML =
-    "<h1>THE VOID ARCHITECT HAS MANIFESTED</h1><p>You opened the door.</p>";
-  document.body.style.background = "black";
-  document.body.style.color = "white";
+// Final manifestation
+function finalTakeover(){
+  document.body.innerHTML="<h1>THE VOID ARCHITECT HAS MANIFESTED</h1><p>You opened the door to eternity.</p>";
+  document.body.style.background="black";
+  document.body.style.color="white";
   localStorage.removeItem("corruption");
 }
 
-setInterval(() => {
-  if (Math.random() < 0.1 && corruption > 5) {
-    show("…we are closer than you think…");
-  }
-}, 5000);
-
-let typed = "";
-document.addEventListener("keydown", (e) => {
+// Hidden typed ending
+document.addEventListener("keydown", e=>{
   typed += e.key.toLowerCase();
-
-  if (typed.includes("architect")) {
-    show("HIDDEN ENDING: You spoke its name.");
-    document.body.style.background = "white";
-    document.body.style.color = "black";
+  if(typed.includes("architect")){
+    show("HIDDEN ENDING: You spoke its name. The Architect responds.");
+    architectImg.style.opacity=1;
+    document.body.style.background="white";
+    document.body.style.color="black";
   }
 });
-</script>
 
+// Window resize for starfield
+window.addEventListener("resize", ()=>{
+  canvas.width=window.innerWidth;
+  canvas.height=window.innerHeight;
+});
+</script>
 </body>
 </html>
