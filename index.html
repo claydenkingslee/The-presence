@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VOID ARCHITECT</title>
+
 <style>
 body {
   margin:0;
@@ -17,20 +18,18 @@ body {
 
 #container {
   position:relative;
-  z-index:2;
-  max-width:90%;
-  margin:auto;
-  padding-top:50px;
+  z-index:3;
+  padding-top:40px;
 }
 
 h1 {
-  font-size:32px;
-  letter-spacing:4px;
+  font-size:34px;
+  letter-spacing:5px;
 }
 
 button {
   margin:8px;
-  padding:10px 16px;
+  padding:10px 18px;
   background:transparent;
   border:1px solid #8be9fd;
   color:#8be9fd;
@@ -49,14 +48,11 @@ button:hover {
   transition: opacity 0.3s;
 }
 
-#background {
+canvas {
   position:fixed;
   top:0;
   left:0;
-  width:100%;
-  height:100%;
   z-index:1;
-  pointer-events:none;
 }
 
 #architect {
@@ -64,148 +60,173 @@ button:hover {
   top:50%;
   left:50%;
   transform:translate(-50%,-50%);
-  width:50%;
+  width:350px;
   opacity:0;
   transition: opacity 2s ease, transform 2s ease;
-  z-index:1;
-  pointer-events:none;
+  z-index:2;
 }
 </style>
 </head>
-<body>
-<canvas id="background"></canvas>
 
-<img id="architect" src="https://i.imgur.com/42ykbD0.png" alt="Void Architect">
+<body>
+
+<canvas id="bg"></canvas>
+
+<!-- ORIGINAL CUSTOM SILHOUETTE -->
+<img id="architect"
+src="https://i.imgur.com/W5D6bGx.png"
+alt="Void Architect">
 
 <div id="container">
 <h1>VOID ARCHITECT</h1>
+
 <button onclick="interact()">Observe</button>
 <button onclick="interact()">Listen</button>
 <button onclick="interact()">Signal</button>
 <button onclick="interact()">Transmit</button>
 
-<div id="log">Awaiting cosmic input...</div>
+<div id="log">A distant presence stirs...</div>
 </div>
 
 <script>
-// Persistent state
 let corruption = parseInt(localStorage.getItem("corruption")) || 0;
-let log = document.getElementById("log");
-let architectImg = document.getElementById("architect");
+let phase = parseInt(localStorage.getItem("phase")) || 1;
 
-// Typing hidden ending
-let typed = "";
+let log = document.getElementById("log");
+let architect = document.getElementById("architect");
 
 function save() {
   localStorage.setItem("corruption", corruption);
+  localStorage.setItem("phase", phase);
 }
 
-function show(msg) {
-  log.style.opacity = 0;
-  setTimeout(() => {
-    log.innerText = msg;
-    log.style.opacity = 1;
-  }, 200);
+function show(msg){
+  log.style.opacity=0;
+  setTimeout(()=>{
+    log.innerText=msg;
+    log.style.opacity=1;
+  },200);
 }
 
-// Screen distort for horror effect
-function distort() {
-  document.body.style.transform = "skew(" + (Math.random()*6-3) + "deg)";
+function distort(){
+  document.body.style.transform="skew("+(Math.random()*6-3)+"deg)";
   setTimeout(()=>{document.body.style.transform="none"},120);
 }
 
-// Background starfield
-const canvas = document.getElementById("background");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
+function interact(){
+  corruption++;
+  if(Math.random()<0.3) distort();
 
-let stars = [];
+  // PHASE 1 – Awakening
+  if(phase===1){
+    if(corruption<10){
+      show("A signal echoes through space.");
+      architect.style.opacity=0.2;
+    } else {
+      phase=2;
+      show("The Void Architect begins to materialize.");
+    }
+  }
+
+  // PHASE 2 – Manifestation
+  else if(phase===2){
+    architect.style.opacity=0.6;
+    architect.style.transform="translate(-50%,-50%) scale(1.2)";
+    show("It watches. It learns.");
+    document.body.style.color="#ff5555";
+
+    if(corruption>25){
+      phase=3;
+      show("MANIFESTATION COMPLETE.");
+    }
+  }
+
+  // PHASE 3 – Takeover
+  else if(phase===3){
+    architect.style.opacity=1;
+    architect.style.transform="translate(-50%,-50%) scale(1.5)";
+    show("Reality bends around its will.");
+    document.body.style.background="#140000";
+
+    if(corruption>40){
+      phase=4;
+      show("Something else answers the call...");
+    }
+  }
+
+  // PHASE 4 – SECOND ENTITY
+  else if(phase===4){
+    show("The Architect was not alone.");
+    document.body.style.background="black";
+    document.body.style.color="white";
+
+    if(corruption>55){
+      finalPhase();
+    }
+  }
+
+  save();
+}
+
+function finalPhase(){
+  document.body.innerHTML=
+  "<h1>THE COSMIC CONVERGENCE HAS BEGUN</h1><p>You triggered the collapse of dimensions.</p>";
+  document.body.style.background="black";
+  document.body.style.color="white";
+  localStorage.clear();
+}
+
+// STARFIELD + PLANETS
+const canvas=document.getElementById("bg");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
+
+let stars=[];
 for(let i=0;i<200;i++){
   stars.push({
     x:Math.random()*canvas.width,
     y:Math.random()*canvas.height,
     size:Math.random()*2,
-    speed:Math.random()*0.5 + 0.2
+    speed:Math.random()*0.5+0.2
   });
 }
 
-function animateStars(){
+let planets=[
+  {x:200,y:150,r:40,color:"#551a8b"},
+  {x:canvas.width-250,y:300,r:60,color:"#2222aa"},
+  {x:canvas.width/2,y:canvas.height-150,r:50,color:"#883333"}
+];
+
+function animate(){
   ctx.fillStyle="black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
+  // stars
   ctx.fillStyle="white";
   stars.forEach(s=>{
     ctx.fillRect(s.x,s.y,s.size,s.size);
-    s.y += s.speed;
+    s.y+=s.speed;
     if(s.y>canvas.height) s.y=0;
   });
-  requestAnimationFrame(animateStars);
+
+  // planets
+  planets.forEach(p=>{
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle=p.color;
+    ctx.fill();
+  });
+
+  requestAnimationFrame(animate);
 }
-animateStars();
+animate();
 
-// Interaction function
-function interact(){
-  corruption++;
-  save();
-
-  if(Math.random()<0.3) distort();
-
-  // Phase 1
-  if(corruption<5){
-    show("A faint signal pulses from beyond.");
-    architectImg.style.opacity=0.1;
-  }
-  // Phase 2
-  else if(corruption<15){
-    show("The presence grows stronger. You feel its gaze.");
-    architectImg.style.opacity=0.3;
-    architectImg.style.transform="translate(-50%,-50%) scale(1.1)";
-    document.body.style.background="#050510";
-  }
-  // Phase 3
-  else if(corruption<30){
-    show("The Void Architect begins to materialize.");
-    architectImg.style.opacity=0.6;
-    architectImg.style.transform="translate(-50%,-50%) scale(1.3)";
-    document.body.style.color="#ff5555";
-  }
-  // Phase 4
-  else if(corruption<50){
-    show("It looms over you. Reality distorts.");
-    architectImg.style.opacity=0.9;
-    architectImg.style.transform="translate(-50%,-50%) scale(1.5)";
-    document.body.style.background="#140000";
-  }
-  // Final Takeover
-  else{
-    finalTakeover();
-  }
-}
-
-// Final manifestation
-function finalTakeover(){
-  document.body.innerHTML="<h1>THE VOID ARCHITECT HAS MANIFESTED</h1><p>You opened the door to eternity.</p>";
-  document.body.style.background="black";
-  document.body.style.color="white";
-  localStorage.removeItem("corruption");
-}
-
-// Hidden typed ending
-document.addEventListener("keydown", e=>{
-  typed += e.key.toLowerCase();
-  if(typed.includes("architect")){
-    show("HIDDEN ENDING: You spoke its name. The Architect responds.");
-    architectImg.style.opacity=1;
-    document.body.style.background="white";
-    document.body.style.color="black";
-  }
-});
-
-// Window resize for starfield
-window.addEventListener("resize", ()=>{
+window.addEventListener("resize",()=>{
   canvas.width=window.innerWidth;
   canvas.height=window.innerHeight;
 });
 </script>
+
 </body>
 </html>
