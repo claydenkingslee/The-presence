@@ -2,180 +2,136 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>Void Architect – Phase 5</title>
-
+<title>The Architect</title>
 <style>
-html, body {
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: black;
-  font-family: 'Arial', sans-serif;
-}
-
-h1 {
-  position: absolute;
-  top: 40px;
-  width: 100%;
-  text-align: center;
-  letter-spacing: 6px;
-  font-weight: 300;
-  color: #8ecfff;
-}
-
-.phase {
-  position: absolute;
-  top: 90px;
-  width: 100%;
-  text-align: center;
-  color: #aaa;
-  font-size: 14px;
-  letter-spacing: 2px;
-}
-
-svg {
-  width: 100vw;
-  height: 100vh;
-}
+  body {
+    margin: 0;
+    background: #000;
+    overflow: hidden;
+  }
 </style>
 </head>
-
 <body>
 
-<h1>VOID ARCHITECT</h1>
-<div class="phase">Phase 5 — Architect Unbound</div>
+<svg viewBox="0 0 1200 800" width="100%" height="100%">
 
-<svg viewBox="0 0 800 1000">
+  <defs>
 
-<defs>
+    <!-- Nebula Background Gradient -->
+    <radialGradient id="nebulaGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%" stop-color="#222831"/>
+      <stop offset="50%" stop-color="#111418"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </radialGradient>
 
-<!-- Nebula Gradient -->
-<radialGradient id="nebula" cx="50%" cy="60%" r="80%">
-  <stop offset="0%" stop-color="#220044"/>
-  <stop offset="50%" stop-color="#0b0015"/>
-  <stop offset="100%" stop-color="#000000"/>
-</radialGradient>
+    <!-- Moving Background Animation -->
+    <linearGradient id="mist" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2a2f36" stop-opacity="0.4"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.1"/>
+      <animate attributeName="x1" values="0%;100%;0%" dur="20s" repeatCount="indefinite"/>
+      <animate attributeName="x2" values="100%;200%;100%" dur="20s" repeatCount="indefinite"/>
+    </linearGradient>
 
-<!-- Robe Gradient -->
-<linearGradient id="robeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-  <stop offset="0%" stop-color="#1a1a1a"/>
-  <stop offset="50%" stop-color="#0a0a0a"/>
-  <stop offset="100%" stop-color="#000000"/>
-</linearGradient>
+    <!-- Robe Gradient -->
+    <linearGradient id="robeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#3a3f46"/>
+      <stop offset="100%" stop-color="#1a1d22"/>
+    </linearGradient>
 
-<!-- Hood Gradient -->
-<linearGradient id="hoodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
-  <stop offset="0%" stop-color="#2a2a2a"/>
-  <stop offset="100%" stop-color="#111"/>
-</linearGradient>
+    <!-- Armor Metal Gradient -->
+    <linearGradient id="metalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#666"/>
+      <stop offset="50%" stop-color="#333"/>
+      <stop offset="100%" stop-color="#111"/>
+    </linearGradient>
 
-<!-- Eye Gradient -->
-<radialGradient id="eyeGrad">
-  <stop offset="0%" stop-color="#ff4444"/>
-  <stop offset="100%" stop-color="#550000"/>
-</radialGradient>
+    <!-- Eye Glow -->
+    <radialGradient id="eyeGrad">
+      <stop offset="0%" stop-color="#ff3c3c"/>
+      <stop offset="100%" stop-color="#550000"/>
+    </radialGradient>
 
-<!-- Symbol Gradient -->
-<radialGradient id="symbolCore">
-  <stop offset="0%" stop-color="#00ffff"/>
-  <stop offset="100%" stop-color="#004444"/>
-</radialGradient>
+    <!-- Glow Filter -->
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="4" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
 
-<!-- Glow Filter -->
-<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
-  <feGaussianBlur stdDeviation="6" result="blur"/>
-  <feMerge>
-    <feMergeNode in="blur"/>
-    <feMergeNode in="SourceGraphic"/>
-  </feMerge>
-</filter>
+  </defs>
 
-<!-- Soft Glow -->
-<filter id="softGlow">
-  <feGaussianBlur stdDeviation="3"/>
-</filter>
+  <!-- Background -->
+  <rect width="1200" height="800" fill="url(#nebulaGrad)" />
+  <rect width="1200" height="800" fill="url(#mist)" />
 
-</defs>
+  <!-- Floating Animation -->
+  <g>
+    <animateTransform attributeName="transform"
+      type="translate"
+      values="0 0; 0 -10; 0 0"
+      dur="6s"
+      repeatCount="indefinite"/>
 
-<!-- Background -->
-<rect width="800" height="1000" fill="url(#nebula)"/>
+    <!-- Cloak Back -->
+    <path d="M480 350 Q600 700 720 350 Z"
+          fill="url(#robeGrad)" opacity="0.9"/>
 
-<!-- Starfield -->
-<g opacity="0.6">
-  <circle cx="100" cy="200" r="1.5" fill="white"/>
-  <circle cx="300" cy="400" r="1" fill="white"/>
-  <circle cx="700" cy="600" r="1.2" fill="white"/>
-  <circle cx="500" cy="150" r="1.5" fill="white"/>
-  <circle cx="650" cy="350" r="1" fill="white"/>
-  <circle cx="200" cy="750" r="1.4" fill="white"/>
-  <circle cx="400" cy="900" r="1" fill="white"/>
-</g>
+    <!-- Legs -->
+    <rect x="540" y="550" width="40" height="120" fill="url(#metalGrad)" rx="10"/>
+    <rect x="620" y="550" width="40" height="120" fill="url(#metalGrad)" rx="10"/>
 
-<!-- Floating Architect -->
-<g>
+    <!-- Boots -->
+    <ellipse cx="560" cy="680" rx="40" ry="15" fill="#111"/>
+    <ellipse cx="640" cy="680" rx="40" ry="15" fill="#111"/>
 
-<animateTransform attributeName="transform"
-type="translate"
-values="0 0; 0 -10; 0 0"
-dur="6s"
-repeatCount="indefinite"/>
+    <!-- Torso Armor -->
+    <path d="M520 300 L680 300 L650 500 L550 500 Z"
+          fill="url(#metalGrad)" stroke="#888" stroke-width="2"/>
 
-<!-- Rim Light Silhouette -->
-<polygon points="250,800 550,800 500,400 300,400"
-fill="none"
-stroke="#66ccff"
-stroke-width="4"
-filter="url(#softGlow)"/>
+    <!-- Robe Front -->
+    <path d="M500 350 Q600 650 700 350"
+          fill="none" stroke="#222" stroke-width="80" opacity="0.6"/>
 
-<!-- Robe -->
-<polygon points="250,800 550,800 500,400 300,400"
-fill="url(#robeGrad)"/>
+    <!-- Arms -->
+    <rect x="440" y="320" width="60" height="180"
+          fill="url(#metalGrad)" rx="20"/>
+    <rect x="700" y="320" width="60" height="180"
+          fill="url(#metalGrad)" rx="20"/>
 
-<!-- Hood -->
-<polygon points="325,350 475,350 450,250 350,250"
-fill="url(#hoodGrad)"/>
+    <!-- Shoulder Armor -->
+    <ellipse cx="470" cy="320" rx="60" ry="40"
+             fill="url(#metalGrad)"/>
+    <ellipse cx="730" cy="320" rx="60" ry="40"
+             fill="url(#metalGrad)"/>
 
-<!-- Head -->
-<circle cx="400" cy="350" r="60" fill="#1c1c1c"/>
+    <!-- Hood -->
+    <path d="M540 220 Q600 150 660 220 L680 300 L520 300 Z"
+          fill="url(#robeGrad)"/>
 
-<!-- Eyes -->
-<circle cx="375" cy="345" r="8"
-fill="url(#eyeGrad)"
-filter="url(#glow)">
-<animate attributeName="r"
-values="8;9;8"
-dur="2s"
-repeatCount="indefinite"/>
-</circle>
+    <!-- Face Shadow -->
+    <ellipse cx="600" cy="250" rx="40" ry="50"
+             fill="#111"/>
 
-<circle cx="425" cy="345" r="8"
-fill="url(#eyeGrad)"
-filter="url(#glow)">
-<animate attributeName="r"
-values="8;9;8"
-dur="2s"
-repeatCount="indefinite"/>
-</circle>
+    <!-- Eyes -->
+    <circle cx="585" cy="250" r="6"
+            fill="url(#eyeGrad)" filter="url(#glow)"/>
+    <circle cx="615" cy="250" r="6"
+            fill="url(#eyeGrad)" filter="url(#glow)"/>
 
-<!-- Chest Symbol Outer -->
-<polygon points="360,500 440,500 470,560 400,620 330,560"
-fill="none"
-stroke="#00ffff"
-stroke-width="6"
-filter="url(#glow)"/>
+    <!-- Superman-style Symbol -->
+    <polygon points="560,350 640,350 670,400 600,460 530,400"
+             fill="#00ffff"
+             stroke="#ffffff"
+             stroke-width="4"
+             filter="url(#glow)"/>
 
-<!-- Chest Symbol Core -->
-<polygon points="360,500 440,500 470,560 400,620 330,560"
-fill="url(#symbolCore)"
-opacity="0.8"
-filter="url(#glow)">
-<animate attributeName="opacity"
-values="0.7;1;0.7"
-dur="3s"
-repeatCount="indefinite"/>
-</polygon>
+    <!-- Symbol Inner Shape -->
+    <path d="M575 370 Q600 340 625 370 Q600 400 575 370"
+          fill="#111"/>
 
-</g>
+  </g>
 
 </svg>
 
