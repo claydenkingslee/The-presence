@@ -1,183 +1,183 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Void Architect</title>
+<meta charset="UTF-8">
+<title>Void Architect – Phase 5</title>
+
 <style>
-
-body {
+html, body {
   margin: 0;
+  padding: 0;
   overflow: hidden;
-  font-family: 'Orbitron', sans-serif;
   background: black;
-  color: #9fdcff;
-  text-align: center;
-}
-
-/* Animated Nebula Background */
-body::before {
-  content: "";
-  position: fixed;
-  width: 300%;
-  height: 300%;
-  background: radial-gradient(circle at 30% 30%, #2b0055, transparent 40%),
-              radial-gradient(circle at 70% 70%, #001a44, transparent 40%),
-              radial-gradient(circle at 50% 50%, #3a0066, transparent 50%);
-  animation: nebulaMove 40s infinite linear;
-  z-index: -2;
-}
-
-@keyframes nebulaMove {
-  0% { transform: translate(-10%, -10%) rotate(0deg); }
-  100% { transform: translate(-20%, -20%) rotate(360deg); }
-}
-
-/* Stars */
-canvas {
-  position: fixed;
-  z-index: -1;
+  font-family: 'Arial', sans-serif;
 }
 
 h1 {
-  letter-spacing: 8px;
-  margin-top: 20px;
+  position: absolute;
+  top: 40px;
+  width: 100%;
+  text-align: center;
+  letter-spacing: 6px;
+  font-weight: 300;
+  color: #8ecfff;
 }
 
-button {
-  padding: 10px 20px;
-  margin: 10px;
-  background: transparent;
-  border: 2px solid #9fdcff;
-  color: #9fdcff;
-  cursor: pointer;
-  transition: 0.3s;
-}
-
-button:hover {
-  background: #9fdcff;
-  color: black;
-}
-
-#phaseText {
-  margin-top: 15px;
+.phase {
+  position: absolute;
+  top: 90px;
+  width: 100%;
+  text-align: center;
+  color: #aaa;
+  font-size: 14px;
+  letter-spacing: 2px;
 }
 
 svg {
-  margin-top: 20px;
-  width: 300px;
-  transition: 1s;
+  width: 100vw;
+  height: 100vh;
 }
-
-.glow {
-  filter: drop-shadow(0 0 10px red);
-}
-
 </style>
 </head>
+
 <body>
 
-<canvas id="stars"></canvas>
-
 <h1>VOID ARCHITECT</h1>
+<div class="phase">Phase 5 — Architect Unbound</div>
 
-<button onclick="progress()">Advance Phase</button>
+<svg viewBox="0 0 800 1000">
 
-<p id="phaseText">Phase 1 — Dormant</p>
+<defs>
 
-<svg viewBox="0 0 200 400">
+<!-- Nebula Gradient -->
+<radialGradient id="nebula" cx="50%" cy="60%" r="80%">
+  <stop offset="0%" stop-color="#220044"/>
+  <stop offset="50%" stop-color="#0b0015"/>
+  <stop offset="100%" stop-color="#000000"/>
+</radialGradient>
 
-  <!-- Hat -->
-  <path id="hat" d="M60 60 L140 60 L120 20 L80 20 Z"
-        fill="#444"/>
+<!-- Robe Gradient -->
+<linearGradient id="robeGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#1a1a1a"/>
+  <stop offset="50%" stop-color="#0a0a0a"/>
+  <stop offset="100%" stop-color="#000000"/>
+</linearGradient>
 
-  <!-- Hood -->
-  <path id="hood" d="M70 60 Q100 120 130 60 Z"
-        fill="#555"/>
+<!-- Hood Gradient -->
+<linearGradient id="hoodGrad" x1="0%" y1="0%" x2="0%" y2="100%">
+  <stop offset="0%" stop-color="#2a2a2a"/>
+  <stop offset="100%" stop-color="#111"/>
+</linearGradient>
 
-  <!-- Face -->
-  <circle cx="100" cy="110" r="25" fill="#666"/>
+<!-- Eye Gradient -->
+<radialGradient id="eyeGrad">
+  <stop offset="0%" stop-color="#ff4444"/>
+  <stop offset="100%" stop-color="#550000"/>
+</radialGradient>
 
-  <!-- Eyes -->
-  <circle id="eye1" cx="90" cy="105" r="5" fill="red"/>
-  <circle id="eye2" cx="110" cy="105" r="5" fill="red"/>
+<!-- Symbol Gradient -->
+<radialGradient id="symbolCore">
+  <stop offset="0%" stop-color="#00ffff"/>
+  <stop offset="100%" stop-color="#004444"/>
+</radialGradient>
 
-  <!-- Robe -->
-  <path id="robe" d="M60 150 L140 150 L170 350 L30 350 Z"
-        fill="url(#robeGradient)"/>
+<!-- Glow Filter -->
+<filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+  <feGaussianBlur stdDeviation="6" result="blur"/>
+  <feMerge>
+    <feMergeNode in="blur"/>
+    <feMergeNode in="SourceGraphic"/>
+  </feMerge>
+</filter>
 
-  <!-- Symbol (Superman-style shape) -->
-  <path id="symbol"
-        d="M85 190 L115 190 L125 210 L100 230 L75 210 Z"
-        fill="#9fdcff"/>
+<!-- Soft Glow -->
+<filter id="softGlow">
+  <feGaussianBlur stdDeviation="3"/>
+</filter>
 
-  <defs>
-    <linearGradient id="robeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-      <stop offset="0%" stop-color="#444"/>
-      <stop offset="100%" stop-color="#222"/>
-    </linearGradient>
-  </defs>
+</defs>
+
+<!-- Background -->
+<rect width="800" height="1000" fill="url(#nebula)"/>
+
+<!-- Starfield -->
+<g opacity="0.6">
+  <circle cx="100" cy="200" r="1.5" fill="white"/>
+  <circle cx="300" cy="400" r="1" fill="white"/>
+  <circle cx="700" cy="600" r="1.2" fill="white"/>
+  <circle cx="500" cy="150" r="1.5" fill="white"/>
+  <circle cx="650" cy="350" r="1" fill="white"/>
+  <circle cx="200" cy="750" r="1.4" fill="white"/>
+  <circle cx="400" cy="900" r="1" fill="white"/>
+</g>
+
+<!-- Floating Architect -->
+<g>
+
+<animateTransform attributeName="transform"
+type="translate"
+values="0 0; 0 -10; 0 0"
+dur="6s"
+repeatCount="indefinite"/>
+
+<!-- Rim Light Silhouette -->
+<polygon points="250,800 550,800 500,400 300,400"
+fill="none"
+stroke="#66ccff"
+stroke-width="4"
+filter="url(#softGlow)"/>
+
+<!-- Robe -->
+<polygon points="250,800 550,800 500,400 300,400"
+fill="url(#robeGrad)"/>
+
+<!-- Hood -->
+<polygon points="325,350 475,350 450,250 350,250"
+fill="url(#hoodGrad)"/>
+
+<!-- Head -->
+<circle cx="400" cy="350" r="60" fill="#1c1c1c"/>
+
+<!-- Eyes -->
+<circle cx="375" cy="345" r="8"
+fill="url(#eyeGrad)"
+filter="url(#glow)">
+<animate attributeName="r"
+values="8;9;8"
+dur="2s"
+repeatCount="indefinite"/>
+</circle>
+
+<circle cx="425" cy="345" r="8"
+fill="url(#eyeGrad)"
+filter="url(#glow)">
+<animate attributeName="r"
+values="8;9;8"
+dur="2s"
+repeatCount="indefinite"/>
+</circle>
+
+<!-- Chest Symbol Outer -->
+<polygon points="360,500 440,500 470,560 400,620 330,560"
+fill="none"
+stroke="#00ffff"
+stroke-width="6"
+filter="url(#glow)"/>
+
+<!-- Chest Symbol Core -->
+<polygon points="360,500 440,500 470,560 400,620 330,560"
+fill="url(#symbolCore)"
+opacity="0.8"
+filter="url(#glow)">
+<animate attributeName="opacity"
+values="0.7;1;0.7"
+dur="3s"
+repeatCount="indefinite"/>
+</polygon>
+
+</g>
 
 </svg>
-
-<script>
-
-/* Star Background */
-const canvas = document.getElementById("stars");
-const ctx = canvas.getContext("2d");
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let stars = [];
-
-for (let i = 0; i < 200; i++) {
-  stars.push({
-    x: Math.random() * canvas.width,
-    y: Math.random() * canvas.height,
-    radius: Math.random() * 2
-  });
-}
-
-function drawStars() {
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.fillStyle = "white";
-  stars.forEach(s => {
-    ctx.beginPath();
-    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
-    ctx.fill();
-  });
-}
-
-setInterval(drawStars, 50);
-
-/* Phases */
-let phase = 1;
-
-function progress() {
-  phase++;
-
-  if (phase === 2) {
-    document.getElementById("phaseText").innerText = "Phase 2 — Awakening";
-    document.getElementById("symbol").style.fill = "cyan";
-  }
-
-  if (phase === 3) {
-    document.getElementById("phaseText").innerText = "Phase 3 — Ascension";
-    document.getElementById("eye1").classList.add("glow");
-    document.getElementById("eye2").classList.add("glow");
-  }
-
-  if (phase === 4) {
-    document.getElementById("phaseText").innerText = "Phase 4 — Manifest";
-    document.getElementById("robe").style.fill = "#111";
-    document.querySelector("svg").style.transform = "scale(1.2)";
-  }
-
-  if (phase === 5) {
-    document.getElementById("phaseText").innerText = "Phase 5 — Architect Unbound";
-    document.body.style.background = "black";
-  }
-}
-
-</script>
 
 </body>
 </html>
