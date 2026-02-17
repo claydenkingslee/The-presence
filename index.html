@@ -6,46 +6,47 @@
 <title>VOID ARCHITECT</title>
 
 <style>
-body {
+body{
   margin:0;
   overflow:hidden;
   background:black;
-  color:#ff4d4d;
   font-family:monospace;
+  color:#9fdfff;
   text-align:center;
 }
 
-#ui {
+#ui{
   position:relative;
-  z-index:10;
+  z-index:5;
   padding-top:40px;
 }
 
-h1 {
+h1{
   letter-spacing:6px;
-  font-size:32px;
+  font-size:30px;
 }
 
-button {
+button{
   margin:8px;
   padding:10px 18px;
   background:transparent;
-  border:1px solid #8be9fd;
-  color:#8be9fd;
+  border:1px solid #9fdfff;
+  color:#9fdfff;
   cursor:pointer;
   transition:0.3s;
 }
 
-button:hover {
-  background:#8be9fd;
+button:hover{
+  background:#9fdfff;
   color:black;
 }
 
-#log {
+#log{
   margin-top:20px;
   min-height:40px;
 }
-canvas {
+
+canvas{
   position:fixed;
   top:0;
   left:0;
@@ -56,7 +57,7 @@ canvas {
 
 <body>
 
-<canvas id="space"></canvas>
+<canvas id="bg"></canvas>
 
 <div id="ui">
 <h1>VOID ARCHITECT</h1>
@@ -64,32 +65,34 @@ canvas {
 <button onclick="interact()">Listen</button>
 <button onclick="interact()">Signal</button>
 <button onclick="interact()">Transmit</button>
-<div id="log">A presence beyond the stars awakens...</div>
+<div id="log">A distant anomaly forms...</div>
 </div>
 
 <script>
-const canvas = document.getElementById("space");
+const canvas = document.getElementById("bg");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
 let corruption = parseInt(localStorage.getItem("corruption")) || 0;
-let phase = 1;
 let log = document.getElementById("log");
 
 let stars=[];
-for(let i=0;i<400;i++){
+for(let i=0;i<300;i++){
   stars.push({
     x:Math.random()*canvas.width,
     y:Math.random()*canvas.height,
     size:Math.random()*2,
-    speed:Math.random()*0.3+0.1
+    speed:Math.random()*0.3+0.05
   });
 }
+
+let nebulaOffset=0;
 
 function drawStars(){
   ctx.fillStyle="black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
+
   ctx.fillStyle="white";
   stars.forEach(s=>{
     ctx.fillRect(s.x,s.y,s.size,s.size);
@@ -99,62 +102,79 @@ function drawStars(){
 }
 
 function drawNebula(){
+  nebulaOffset+=0.002;
+
   let gradient = ctx.createRadialGradient(
-    canvas.width/2,canvas.height/2,100,
-    canvas.width/2,canvas.height/2,600);
-  gradient.addColorStop(0,"rgba(100,0,150,0.2)");
+    canvas.width/2 + Math.sin(nebulaOffset)*100,
+    canvas.height/2 + Math.cos(nebulaOffset)*100,
+    100,
+    canvas.width/2,
+    canvas.height/2,
+    800
+  );
+
+  gradient.addColorStop(0,"rgba(80,0,120,0.4)");
+  gradient.addColorStop(0.5,"rgba(0,60,120,0.2)");
   gradient.addColorStop(1,"rgba(0,0,0,0)");
+
   ctx.fillStyle=gradient;
   ctx.fillRect(0,0,canvas.width,canvas.height);
 }
 
-function drawPlanet(x,y,r){
-  let grad = ctx.createRadialGradient(x-r/3,y-r/3,5,x,y,r);
-  grad.addColorStop(0,"#aaaaff");
-  grad.addColorStop(1,"#000044");
-  ctx.beginPath();
-  ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fillStyle=grad;
-  ctx.fill();
-  ctx.shadowColor="#6666ff";
-  ctx.shadowBlur=20;
-  ctx.fill();
-  ctx.shadowBlur=0;
-}
-
 function drawArchitect(){
-  let centerX = canvas.width/2;
-  let centerY = canvas.height/2;
+  let centerX=canvas.width/2;
+  let centerY=canvas.height/2 + 50;
 
-  let pulse = 1 + Math.sin(Date.now()*0.002)*0.05;
+  let breathe = 1 + Math.sin(Date.now()*0.002)*0.02;
 
   ctx.save();
   ctx.translate(centerX,centerY);
-  ctx.scale(pulse,pulse);
+  ctx.scale(breathe,breathe);
 
-  // Body silhouette
+  // Robe body
   ctx.beginPath();
-  ctx.moveTo(0,-200);
-  ctx.lineTo(-80,100);
-  ctx.lineTo(80,100);
+  ctx.moveTo(0,-150);
+  ctx.lineTo(-60,80);
+  ctx.lineTo(60,80);
   ctx.closePath();
-  ctx.fillStyle="black";
+  ctx.fillStyle="#2a2a2a";
   ctx.fill();
+
+  // Armor shoulders
+  ctx.fillStyle="#3a3a3a";
+  ctx.fillRect(-80,-120,40,30);
+  ctx.fillRect(40,-120,40,30);
 
   // Head
   ctx.beginPath();
-  ctx.arc(0,-240,60,0,Math.PI*2);
+  ctx.arc(0,-170,35,0,Math.PI*2);
+  ctx.fillStyle="#444";
   ctx.fill();
 
-  // Glowing eyes
+  // Hat
+  ctx.fillRect(-70,-210,140,20);
+  ctx.beginPath();
+  ctx.arc(0,-210,45,Math.PI,0);
+  ctx.fill();
+
+  // Eyes
   ctx.fillStyle="red";
   ctx.shadowColor="red";
-  ctx.shadowBlur=20;
+  ctx.shadowBlur=15;
   ctx.beginPath();
-  ctx.arc(-20,-240,8,0,Math.PI*2);
-  ctx.arc(20,-240,8,0,Math.PI*2);
+  ctx.arc(-12,-170,5,0,Math.PI*2);
+  ctx.arc(12,-170,5,0,Math.PI*2);
   ctx.fill();
   ctx.shadowBlur=0;
+
+  // Chest symbol
+  ctx.strokeStyle="#9fdfff";
+  ctx.lineWidth=2;
+  ctx.beginPath();
+  ctx.moveTo(-10,-80);
+  ctx.lineTo(0,-60);
+  ctx.lineTo(10,-80);
+  ctx.stroke();
 
   ctx.restore();
 }
@@ -163,22 +183,10 @@ function animate(){
   drawStars();
   drawNebula();
 
-  drawPlanet(200,150,70);
-  drawPlanet(canvas.width-200,350,90);
-
-  if(corruption>15){
-    ctx.globalAlpha=Math.min((corruption-15)/30,1);
+  if(corruption>10){
+    ctx.globalAlpha=Math.min((corruption-10)/30,1);
     drawArchitect();
     ctx.globalAlpha=1;
-  }
-
-  if(phase===2){
-    // black hole swirl
-    ctx.beginPath();
-    ctx.arc(canvas.width/2,canvas.height/2,250,0,Math.PI*2);
-    ctx.strokeStyle="purple";
-    ctx.lineWidth=4;
-    ctx.stroke();
   }
 
   requestAnimationFrame(animate);
@@ -190,24 +198,16 @@ function interact(){
   localStorage.setItem("corruption",corruption);
 
   if(corruption<10){
-    log.innerText="It senses your curiosity.";
+    log.innerText="It senses your actions.";
   }
   else if(corruption<25){
-    log.innerText="Its eyes open within the void.";
+    log.innerText="A figure forms within the nebula.";
   }
-  else if(corruption<40){
-    log.innerText="The Void Architect descends.";
-  }
-  else if(corruption<60){
-    log.innerText="Reality begins to warp.";
-  }
-  else if(corruption<80){
-    phase=2;
-    log.innerText="A black hole forms behind it.";
+  else if(corruption<50){
+    log.innerText="The Void Architect observes.";
   }
   else{
-    document.body.innerHTML="<h1>DIMENSIONAL COLLAPSE</h1><p>The universe folds inward.</p>";
-    localStorage.clear();
+    log.innerText="Reality destabilizes.";
   }
 }
 
