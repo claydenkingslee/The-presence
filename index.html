@@ -11,20 +11,19 @@ body {
   overflow:hidden;
   background:black;
   color:#8be9fd;
-  font-family: monospace;
+  font-family:monospace;
   text-align:center;
-  transition: background 1s, color 1s;
 }
 
-#container {
+#ui {
   position:relative;
-  z-index:3;
+  z-index:5;
   padding-top:40px;
 }
 
 h1 {
-  font-size:34px;
   letter-spacing:5px;
+  font-size:32px;
 }
 
 button {
@@ -34,7 +33,6 @@ button {
   border:1px solid #8be9fd;
   color:#8be9fd;
   cursor:pointer;
-  font-family:monospace;
 }
 
 button:hover {
@@ -45,7 +43,6 @@ button:hover {
 #log {
   margin-top:20px;
   min-height:40px;
-  transition: opacity 0.3s;
 }
 
 canvas {
@@ -54,136 +51,33 @@ canvas {
   left:0;
   z-index:1;
 }
-
-#architect {
-  position:fixed;
-  top:50%;
-  left:50%;
-  transform:translate(-50%,-50%);
-  width:350px;
-  opacity:0;
-  transition: opacity 2s ease, transform 2s ease;
-  z-index:2;
-}
 </style>
 </head>
-
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="space"></canvas>
 
-<!-- ORIGINAL CUSTOM SILHOUETTE -->
-<img id="architect"
-src="https://i.imgur.com/W5D6bGx.png"
-alt="Void Architect">
-
-<div id="container">
+<div id="ui">
 <h1>VOID ARCHITECT</h1>
-
 <button onclick="interact()">Observe</button>
 <button onclick="interact()">Listen</button>
 <button onclick="interact()">Signal</button>
 <button onclick="interact()">Transmit</button>
-
-<div id="log">A distant presence stirs...</div>
+<div id="log">A distant cosmic vibration begins...</div>
 </div>
 
 <script>
+const canvas = document.getElementById("space");
+const ctx = canvas.getContext("2d");
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
 let corruption = parseInt(localStorage.getItem("corruption")) || 0;
-let phase = parseInt(localStorage.getItem("phase")) || 1;
-
+let phase = 1;
 let log = document.getElementById("log");
-let architect = document.getElementById("architect");
 
-function save() {
-  localStorage.setItem("corruption", corruption);
-  localStorage.setItem("phase", phase);
-}
-
-function show(msg){
-  log.style.opacity=0;
-  setTimeout(()=>{
-    log.innerText=msg;
-    log.style.opacity=1;
-  },200);
-}
-
-function distort(){
-  document.body.style.transform="skew("+(Math.random()*6-3)+"deg)";
-  setTimeout(()=>{document.body.style.transform="none"},120);
-}
-
-function interact(){
-  corruption++;
-  if(Math.random()<0.3) distort();
-
-  // PHASE 1 – Awakening
-  if(phase===1){
-    if(corruption<10){
-      show("A signal echoes through space.");
-      architect.style.opacity=0.2;
-    } else {
-      phase=2;
-      show("The Void Architect begins to materialize.");
-    }
-  }
-
-  // PHASE 2 – Manifestation
-  else if(phase===2){
-    architect.style.opacity=0.6;
-    architect.style.transform="translate(-50%,-50%) scale(1.2)";
-    show("It watches. It learns.");
-    document.body.style.color="#ff5555";
-
-    if(corruption>25){
-      phase=3;
-      show("MANIFESTATION COMPLETE.");
-    }
-  }
-
-  // PHASE 3 – Takeover
-  else if(phase===3){
-    architect.style.opacity=1;
-    architect.style.transform="translate(-50%,-50%) scale(1.5)";
-    show("Reality bends around its will.");
-    document.body.style.background="#140000";
-
-    if(corruption>40){
-      phase=4;
-      show("Something else answers the call...");
-    }
-  }
-
-  // PHASE 4 – SECOND ENTITY
-  else if(phase===4){
-    show("The Architect was not alone.");
-    document.body.style.background="black";
-    document.body.style.color="white";
-
-    if(corruption>55){
-      finalPhase();
-    }
-  }
-
-  save();
-}
-
-function finalPhase(){
-  document.body.innerHTML=
-  "<h1>THE COSMIC CONVERGENCE HAS BEGUN</h1><p>You triggered the collapse of dimensions.</p>";
-  document.body.style.background="black";
-  document.body.style.color="white";
-  localStorage.clear();
-}
-
-// STARFIELD + PLANETS
-const canvas=document.getElementById("bg");
-const ctx=canvas.getContext("2d");
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-
-let stars=[];
-for(let i=0;i<200;i++){
+let stars = [];
+for(let i=0;i<300;i++){
   stars.push({
     x:Math.random()*canvas.width,
     y:Math.random()*canvas.height,
@@ -192,35 +86,104 @@ for(let i=0;i<200;i++){
   });
 }
 
-let planets=[
-  {x:200,y:150,r:40,color:"#551a8b"},
-  {x:canvas.width-250,y:300,r:60,color:"#2222aa"},
-  {x:canvas.width/2,y:canvas.height-150,r:50,color:"#883333"}
-];
-
-function animate(){
+function drawStars(){
   ctx.fillStyle="black";
   ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  // stars
   ctx.fillStyle="white";
   stars.forEach(s=>{
     ctx.fillRect(s.x,s.y,s.size,s.size);
     s.y+=s.speed;
     if(s.y>canvas.height) s.y=0;
   });
+}
 
-  // planets
-  planets.forEach(p=>{
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle=p.color;
-    ctx.fill();
-  });
+function drawPlanet(x,y,r,color1,color2){
+  let gradient = ctx.createRadialGradient(x-r/3,y-r/3,5,x,y,r);
+  gradient.addColorStop(0,color1);
+  gradient.addColorStop(1,color2);
+  ctx.beginPath();
+  ctx.arc(x,y,r,0,Math.PI*2);
+  ctx.fillStyle=gradient;
+  ctx.fill();
+
+  ctx.shadowColor=color1;
+  ctx.shadowBlur=30;
+  ctx.fill();
+  ctx.shadowBlur=0;
+}
+
+function drawRing(x,y,r){
+  ctx.beginPath();
+  ctx.ellipse(x,y,r+20,r/2,0,0,Math.PI*2);
+  ctx.strokeStyle="rgba(200,200,255,0.6)";
+  ctx.lineWidth=2;
+  ctx.stroke();
+}
+
+function drawArchitect(opacity){
+  ctx.globalAlpha = opacity;
+  ctx.beginPath();
+  ctx.arc(canvas.width/2,canvas.height/2,120,0,Math.PI*2);
+  let grad = ctx.createRadialGradient(canvas.width/2,canvas.height/2,20,canvas.width/2,canvas.height/2,120);
+  grad.addColorStop(0,"#550000");
+  grad.addColorStop(1,"black");
+  ctx.fillStyle=grad;
+  ctx.fill();
+  ctx.globalAlpha = 1;
+}
+
+function animate(){
+  drawStars();
+
+  // Real shaded planets
+  drawPlanet(200,150,60,"#7733ff","#220044");
+  drawRing(200,150,60);
+
+  drawPlanet(canvas.width-250,300,90,"#3355ff","#000066");
+
+  drawPlanet(canvas.width/2,canvas.height-200,70,"#aa3333","#330000");
+
+  // Architect appears based on corruption
+  if(corruption>10){
+    drawArchitect(Math.min(corruption/50,1));
+  }
 
   requestAnimationFrame(animate);
 }
 animate();
+
+function interact(){
+  corruption++;
+  localStorage.setItem("corruption",corruption);
+
+  if(corruption<10){
+    log.innerText="A cosmic presence stirs.";
+  }
+  else if(corruption<25){
+    log.innerText="It watches. It learns.";
+  }
+  else if(corruption<40){
+    log.innerText="The Void Architect emerges.";
+  }
+  else if(corruption<60){
+    log.innerText="Reality begins collapsing inward.";
+  }
+  else{
+    phaseTwo();
+  }
+}
+
+function phaseTwo(){
+  log.innerText="A black hole forms behind the Architect.";
+  ctx.beginPath();
+  ctx.arc(canvas.width/2,canvas.height/2,200,0,Math.PI*2);
+  ctx.fillStyle="black";
+  ctx.fill();
+  setTimeout(()=>{
+    document.body.innerHTML="<h1>DIMENSIONAL COLLAPSE INITIATED</h1>";
+    localStorage.clear();
+  },4000);
+}
 
 window.addEventListener("resize",()=>{
   canvas.width=window.innerWidth;
