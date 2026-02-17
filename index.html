@@ -10,19 +10,19 @@ body {
   margin:0;
   overflow:hidden;
   background:black;
-  color:#8be9fd;
+  color:#ff4d4d;
   font-family:monospace;
   text-align:center;
 }
 
 #ui {
   position:relative;
-  z-index:5;
+  z-index:10;
   padding-top:40px;
 }
 
 h1 {
-  letter-spacing:5px;
+  letter-spacing:6px;
   font-size:32px;
 }
 
@@ -33,6 +33,7 @@ button {
   border:1px solid #8be9fd;
   color:#8be9fd;
   cursor:pointer;
+  transition:0.3s;
 }
 
 button:hover {
@@ -44,7 +45,6 @@ button:hover {
   margin-top:20px;
   min-height:40px;
 }
-
 canvas {
   position:fixed;
   top:0;
@@ -53,6 +53,7 @@ canvas {
 }
 </style>
 </head>
+
 <body>
 
 <canvas id="space"></canvas>
@@ -63,7 +64,7 @@ canvas {
 <button onclick="interact()">Listen</button>
 <button onclick="interact()">Signal</button>
 <button onclick="interact()">Transmit</button>
-<div id="log">A distant cosmic vibration begins...</div>
+<div id="log">A presence beyond the stars awakens...</div>
 </div>
 
 <script>
@@ -76,13 +77,13 @@ let corruption = parseInt(localStorage.getItem("corruption")) || 0;
 let phase = 1;
 let log = document.getElementById("log");
 
-let stars = [];
-for(let i=0;i<300;i++){
+let stars=[];
+for(let i=0;i<400;i++){
   stars.push({
     x:Math.random()*canvas.width,
     y:Math.random()*canvas.height,
     size:Math.random()*2,
-    speed:Math.random()*0.5+0.2
+    speed:Math.random()*0.3+0.1
   });
 }
 
@@ -97,55 +98,87 @@ function drawStars(){
   });
 }
 
-function drawPlanet(x,y,r,color1,color2){
-  let gradient = ctx.createRadialGradient(x-r/3,y-r/3,5,x,y,r);
-  gradient.addColorStop(0,color1);
-  gradient.addColorStop(1,color2);
+function drawNebula(){
+  let gradient = ctx.createRadialGradient(
+    canvas.width/2,canvas.height/2,100,
+    canvas.width/2,canvas.height/2,600);
+  gradient.addColorStop(0,"rgba(100,0,150,0.2)");
+  gradient.addColorStop(1,"rgba(0,0,0,0)");
+  ctx.fillStyle=gradient;
+  ctx.fillRect(0,0,canvas.width,canvas.height);
+}
+
+function drawPlanet(x,y,r){
+  let grad = ctx.createRadialGradient(x-r/3,y-r/3,5,x,y,r);
+  grad.addColorStop(0,"#aaaaff");
+  grad.addColorStop(1,"#000044");
   ctx.beginPath();
   ctx.arc(x,y,r,0,Math.PI*2);
-  ctx.fillStyle=gradient;
+  ctx.fillStyle=grad;
   ctx.fill();
-
-  ctx.shadowColor=color1;
-  ctx.shadowBlur=30;
+  ctx.shadowColor="#6666ff";
+  ctx.shadowBlur=20;
   ctx.fill();
   ctx.shadowBlur=0;
 }
 
-function drawRing(x,y,r){
-  ctx.beginPath();
-  ctx.ellipse(x,y,r+20,r/2,0,0,Math.PI*2);
-  ctx.strokeStyle="rgba(200,200,255,0.6)";
-  ctx.lineWidth=2;
-  ctx.stroke();
-}
+function drawArchitect(){
+  let centerX = canvas.width/2;
+  let centerY = canvas.height/2;
 
-function drawArchitect(opacity){
-  ctx.globalAlpha = opacity;
+  let pulse = 1 + Math.sin(Date.now()*0.002)*0.05;
+
+  ctx.save();
+  ctx.translate(centerX,centerY);
+  ctx.scale(pulse,pulse);
+
+  // Body silhouette
   ctx.beginPath();
-  ctx.arc(canvas.width/2,canvas.height/2,120,0,Math.PI*2);
-  let grad = ctx.createRadialGradient(canvas.width/2,canvas.height/2,20,canvas.width/2,canvas.height/2,120);
-  grad.addColorStop(0,"#550000");
-  grad.addColorStop(1,"black");
-  ctx.fillStyle=grad;
+  ctx.moveTo(0,-200);
+  ctx.lineTo(-80,100);
+  ctx.lineTo(80,100);
+  ctx.closePath();
+  ctx.fillStyle="black";
   ctx.fill();
-  ctx.globalAlpha = 1;
+
+  // Head
+  ctx.beginPath();
+  ctx.arc(0,-240,60,0,Math.PI*2);
+  ctx.fill();
+
+  // Glowing eyes
+  ctx.fillStyle="red";
+  ctx.shadowColor="red";
+  ctx.shadowBlur=20;
+  ctx.beginPath();
+  ctx.arc(-20,-240,8,0,Math.PI*2);
+  ctx.arc(20,-240,8,0,Math.PI*2);
+  ctx.fill();
+  ctx.shadowBlur=0;
+
+  ctx.restore();
 }
 
 function animate(){
   drawStars();
+  drawNebula();
 
-  // Real shaded planets
-  drawPlanet(200,150,60,"#7733ff","#220044");
-  drawRing(200,150,60);
+  drawPlanet(200,150,70);
+  drawPlanet(canvas.width-200,350,90);
 
-  drawPlanet(canvas.width-250,300,90,"#3355ff","#000066");
+  if(corruption>15){
+    ctx.globalAlpha=Math.min((corruption-15)/30,1);
+    drawArchitect();
+    ctx.globalAlpha=1;
+  }
 
-  drawPlanet(canvas.width/2,canvas.height-200,70,"#aa3333","#330000");
-
-  // Architect appears based on corruption
-  if(corruption>10){
-    drawArchitect(Math.min(corruption/50,1));
+  if(phase===2){
+    // black hole swirl
+    ctx.beginPath();
+    ctx.arc(canvas.width/2,canvas.height/2,250,0,Math.PI*2);
+    ctx.strokeStyle="purple";
+    ctx.lineWidth=4;
+    ctx.stroke();
   }
 
   requestAnimationFrame(animate);
@@ -157,32 +190,25 @@ function interact(){
   localStorage.setItem("corruption",corruption);
 
   if(corruption<10){
-    log.innerText="A cosmic presence stirs.";
+    log.innerText="It senses your curiosity.";
   }
   else if(corruption<25){
-    log.innerText="It watches. It learns.";
+    log.innerText="Its eyes open within the void.";
   }
   else if(corruption<40){
-    log.innerText="The Void Architect emerges.";
+    log.innerText="The Void Architect descends.";
   }
   else if(corruption<60){
-    log.innerText="Reality begins collapsing inward.";
+    log.innerText="Reality begins to warp.";
+  }
+  else if(corruption<80){
+    phase=2;
+    log.innerText="A black hole forms behind it.";
   }
   else{
-    phaseTwo();
-  }
-}
-
-function phaseTwo(){
-  log.innerText="A black hole forms behind the Architect.";
-  ctx.beginPath();
-  ctx.arc(canvas.width/2,canvas.height/2,200,0,Math.PI*2);
-  ctx.fillStyle="black";
-  ctx.fill();
-  setTimeout(()=>{
-    document.body.innerHTML="<h1>DIMENSIONAL COLLAPSE INITIATED</h1>";
+    document.body.innerHTML="<h1>DIMENSIONAL COLLAPSE</h1><p>The universe folds inward.</p>";
     localStorage.clear();
-  },4000);
+  }
 }
 
 window.addEventListener("resize",()=>{
