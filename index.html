@@ -1,220 +1,182 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>VOID ARCHITECT</title>
-
+<title>Void Architect</title>
 <style>
-body{
-  margin:0;
-  overflow:hidden;
-  background:black;
-  font-family:monospace;
-  color:#9fdfff;
-  text-align:center;
+
+body {
+  margin: 0;
+  overflow: hidden;
+  font-family: 'Orbitron', sans-serif;
+  background: black;
+  color: #9fdcff;
+  text-align: center;
 }
 
-#ui{
-  position:relative;
-  z-index:5;
-  padding-top:40px;
+/* Animated Nebula Background */
+body::before {
+  content: "";
+  position: fixed;
+  width: 300%;
+  height: 300%;
+  background: radial-gradient(circle at 30% 30%, #2b0055, transparent 40%),
+              radial-gradient(circle at 70% 70%, #001a44, transparent 40%),
+              radial-gradient(circle at 50% 50%, #3a0066, transparent 50%);
+  animation: nebulaMove 40s infinite linear;
+  z-index: -2;
 }
 
-h1{
-  letter-spacing:6px;
-  font-size:30px;
+@keyframes nebulaMove {
+  0% { transform: translate(-10%, -10%) rotate(0deg); }
+  100% { transform: translate(-20%, -20%) rotate(360deg); }
 }
 
-button{
-  margin:8px;
-  padding:10px 18px;
-  background:transparent;
-  border:1px solid #9fdfff;
-  color:#9fdfff;
-  cursor:pointer;
-  transition:0.3s;
+/* Stars */
+canvas {
+  position: fixed;
+  z-index: -1;
 }
 
-button:hover{
-  background:#9fdfff;
-  color:black;
+h1 {
+  letter-spacing: 8px;
+  margin-top: 20px;
 }
 
-#log{
-  margin-top:20px;
-  min-height:40px;
+button {
+  padding: 10px 20px;
+  margin: 10px;
+  background: transparent;
+  border: 2px solid #9fdcff;
+  color: #9fdcff;
+  cursor: pointer;
+  transition: 0.3s;
 }
 
-canvas{
-  position:fixed;
-  top:0;
-  left:0;
-  z-index:1;
+button:hover {
+  background: #9fdcff;
+  color: black;
 }
+
+#phaseText {
+  margin-top: 15px;
+}
+
+svg {
+  margin-top: 20px;
+  width: 300px;
+  transition: 1s;
+}
+
+.glow {
+  filter: drop-shadow(0 0 10px red);
+}
+
 </style>
 </head>
-
 <body>
 
-<canvas id="bg"></canvas>
+<canvas id="stars"></canvas>
 
-<div id="ui">
 <h1>VOID ARCHITECT</h1>
-<button onclick="interact()">Observe</button>
-<button onclick="interact()">Listen</button>
-<button onclick="interact()">Signal</button>
-<button onclick="interact()">Transmit</button>
-<div id="log">A distant anomaly forms...</div>
-</div>
+
+<button onclick="progress()">Advance Phase</button>
+
+<p id="phaseText">Phase 1 — Dormant</p>
+
+<svg viewBox="0 0 200 400">
+
+  <!-- Hat -->
+  <path id="hat" d="M60 60 L140 60 L120 20 L80 20 Z"
+        fill="#444"/>
+
+  <!-- Hood -->
+  <path id="hood" d="M70 60 Q100 120 130 60 Z"
+        fill="#555"/>
+
+  <!-- Face -->
+  <circle cx="100" cy="110" r="25" fill="#666"/>
+
+  <!-- Eyes -->
+  <circle id="eye1" cx="90" cy="105" r="5" fill="red"/>
+  <circle id="eye2" cx="110" cy="105" r="5" fill="red"/>
+
+  <!-- Robe -->
+  <path id="robe" d="M60 150 L140 150 L170 350 L30 350 Z"
+        fill="url(#robeGradient)"/>
+
+  <!-- Symbol (Superman-style shape) -->
+  <path id="symbol"
+        d="M85 190 L115 190 L125 210 L100 230 L75 210 Z"
+        fill="#9fdcff"/>
+
+  <defs>
+    <linearGradient id="robeGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#444"/>
+      <stop offset="100%" stop-color="#222"/>
+    </linearGradient>
+  </defs>
+
+</svg>
 
 <script>
-const canvas = document.getElementById("bg");
+
+/* Star Background */
+const canvas = document.getElementById("stars");
 const ctx = canvas.getContext("2d");
 canvas.width = window.innerWidth;
 canvas.height = window.innerHeight;
 
-let corruption = parseInt(localStorage.getItem("corruption")) || 0;
-let log = document.getElementById("log");
+let stars = [];
 
-let stars=[];
-for(let i=0;i<300;i++){
+for (let i = 0; i < 200; i++) {
   stars.push({
-    x:Math.random()*canvas.width,
-    y:Math.random()*canvas.height,
-    size:Math.random()*2,
-    speed:Math.random()*0.3+0.05
+    x: Math.random() * canvas.width,
+    y: Math.random() * canvas.height,
+    radius: Math.random() * 2
   });
 }
 
-let nebulaOffset=0;
-
-function drawStars(){
-  ctx.fillStyle="black";
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-
-  ctx.fillStyle="white";
-  stars.forEach(s=>{
-    ctx.fillRect(s.x,s.y,s.size,s.size);
-    s.y+=s.speed;
-    if(s.y>canvas.height) s.y=0;
+function drawStars() {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.fillStyle = "white";
+  stars.forEach(s => {
+    ctx.beginPath();
+    ctx.arc(s.x, s.y, s.radius, 0, Math.PI * 2);
+    ctx.fill();
   });
 }
 
-function drawNebula(){
-  nebulaOffset+=0.002;
+setInterval(drawStars, 50);
 
-  let gradient = ctx.createRadialGradient(
-    canvas.width/2 + Math.sin(nebulaOffset)*100,
-    canvas.height/2 + Math.cos(nebulaOffset)*100,
-    100,
-    canvas.width/2,
-    canvas.height/2,
-    800
-  );
+/* Phases */
+let phase = 1;
 
-  gradient.addColorStop(0,"rgba(80,0,120,0.4)");
-  gradient.addColorStop(0.5,"rgba(0,60,120,0.2)");
-  gradient.addColorStop(1,"rgba(0,0,0,0)");
+function progress() {
+  phase++;
 
-  ctx.fillStyle=gradient;
-  ctx.fillRect(0,0,canvas.width,canvas.height);
-}
-
-function drawArchitect(){
-  let centerX=canvas.width/2;
-  let centerY=canvas.height/2 + 50;
-
-  let breathe = 1 + Math.sin(Date.now()*0.002)*0.02;
-
-  ctx.save();
-  ctx.translate(centerX,centerY);
-  ctx.scale(breathe,breathe);
-
-  // Robe body
-  ctx.beginPath();
-  ctx.moveTo(0,-150);
-  ctx.lineTo(-60,80);
-  ctx.lineTo(60,80);
-  ctx.closePath();
-  ctx.fillStyle="#2a2a2a";
-  ctx.fill();
-
-  // Armor shoulders
-  ctx.fillStyle="#3a3a3a";
-  ctx.fillRect(-80,-120,40,30);
-  ctx.fillRect(40,-120,40,30);
-
-  // Head
-  ctx.beginPath();
-  ctx.arc(0,-170,35,0,Math.PI*2);
-  ctx.fillStyle="#444";
-  ctx.fill();
-
-  // Hat
-  ctx.fillRect(-70,-210,140,20);
-  ctx.beginPath();
-  ctx.arc(0,-210,45,Math.PI,0);
-  ctx.fill();
-
-  // Eyes
-  ctx.fillStyle="red";
-  ctx.shadowColor="red";
-  ctx.shadowBlur=15;
-  ctx.beginPath();
-  ctx.arc(-12,-170,5,0,Math.PI*2);
-  ctx.arc(12,-170,5,0,Math.PI*2);
-  ctx.fill();
-  ctx.shadowBlur=0;
-
-  // Chest symbol
-  ctx.strokeStyle="#9fdfff";
-  ctx.lineWidth=2;
-  ctx.beginPath();
-  ctx.moveTo(-10,-80);
-  ctx.lineTo(0,-60);
-  ctx.lineTo(10,-80);
-  ctx.stroke();
-
-  ctx.restore();
-}
-
-function animate(){
-  drawStars();
-  drawNebula();
-
-  if(corruption>10){
-    ctx.globalAlpha=Math.min((corruption-10)/30,1);
-    drawArchitect();
-    ctx.globalAlpha=1;
+  if (phase === 2) {
+    document.getElementById("phaseText").innerText = "Phase 2 — Awakening";
+    document.getElementById("symbol").style.fill = "cyan";
   }
 
-  requestAnimationFrame(animate);
-}
-animate();
+  if (phase === 3) {
+    document.getElementById("phaseText").innerText = "Phase 3 — Ascension";
+    document.getElementById("eye1").classList.add("glow");
+    document.getElementById("eye2").classList.add("glow");
+  }
 
-function interact(){
-  corruption++;
-  localStorage.setItem("corruption",corruption);
+  if (phase === 4) {
+    document.getElementById("phaseText").innerText = "Phase 4 — Manifest";
+    document.getElementById("robe").style.fill = "#111";
+    document.querySelector("svg").style.transform = "scale(1.2)";
+  }
 
-  if(corruption<10){
-    log.innerText="It senses your actions.";
-  }
-  else if(corruption<25){
-    log.innerText="A figure forms within the nebula.";
-  }
-  else if(corruption<50){
-    log.innerText="The Void Architect observes.";
-  }
-  else{
-    log.innerText="Reality destabilizes.";
+  if (phase === 5) {
+    document.getElementById("phaseText").innerText = "Phase 5 — Architect Unbound";
+    document.body.style.background = "black";
   }
 }
 
-window.addEventListener("resize",()=>{
-  canvas.width=window.innerWidth;
-  canvas.height=window.innerHeight;
-});
 </script>
 
 </body>
